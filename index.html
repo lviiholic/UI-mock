@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cap Table Details</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal:       #1DC9A4;
+    --teal-dark:  #17a688;
+    --red:        #e74c3c;
+    --gray-50:    #f8f9fa;
+    --gray-100:   #f1f3f4;
+    --gray-200:   #e8eaed;
+    --gray-400:   #bdc1c6;
+    --gray-600:   #80868b;
+    --gray-800:   #3c4043;
+    --gray-900:   #202124;
+    --blue-badge: #e8f0fe;
+    --blue-text:  #1a73e8;
+    --green-badge:#e6f4ea;
+    --green-text: #137333;
+    --orange-badge:#fce8e6;
+    --orange-text:#c5221f;
+    --amber-badge:#fef9c3;
+    --amber-text: #92400e;
+    --font:       -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --fs-xs:      10px;
+    --fs-sm:      11px;
+    --fs-base:    12px;
+    --fs-md:      13px;
+  }
+
+  body {
+    font-family: var(--font);
+    font-size: var(--fs-base);
+    color: var(--gray-800);
+    background: var(--gray-100);
+    min-height: 100vh;
+  }
+
+  /* ── Top Nav ── */
+  .topnav {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    height: 36px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 4px;
+    font-size: var(--fs-sm);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topnav a { color: var(--teal); text-decoration: none; }
+  .topnav a:hover { text-decoration: underline; }
+  .topnav .sep { color: var(--gray-400); font-size: 14px; }
+  .topnav .current { color: var(--gray-600); }
+
+  /* ── Page Header ── */
+  .page-hdr {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .page-title { font-size: var(--fs-md); font-weight: 600; color: var(--gray-900); }
+  .hdr-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  .btn {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 3px;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1.6;
+  }
+  .btn-teal   { background: var(--teal);  color: #fff; }
+  .btn-teal:hover { background: var(--teal-dark); }
+  .btn-gray   { background: var(--gray-200); color: var(--gray-800); }
+  .btn-gray:hover { background: var(--gray-400); }
+  .btn-red    { background: var(--red); color: #fff; }
+  .btn-outline{ background: #fff; border: 1px solid var(--gray-200); color: var(--gray-800); }
+  .btn-sm     { padding: 3px 8px; font-size: var(--fs-xs); }
+
+  /* ── Layout ── */
+  .page-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+
+  /* ── Info block (top metadata) ── */
+  .info-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 2px;
+  }
+  .info-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--gray-100);
+    min-height: 26px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-lbl {
+    width: 210px; min-width: 210px;
+    padding: 4px 12px;
+    font-size: var(--fs-sm);
+    color: var(--gray-600);
+    font-weight: 500;
+  }
+  .info-val {
+    padding: 4px 12px;
+    font-size: var(--fs-sm);
+    color: var(--gray-800);
+    flex: 1;
+  }
+  .info-val a { color: var(--teal); text-decoration: none; }
+  .info-val a:hover { text-decoration: underline; }
+
+  /* ── Section card ── */
+  .section {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .sec-hdr {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 10px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .sec-hdr:hover { background: var(--gray-100); }
+  .sec-title {
+    display: flex; align-items: center; gap: 6px;
+    font-size: var(--fs-sm); font-weight: 600; color: var(--gray-900);
+  }
+  .chevron {
+    font-size: 13px; color: var(--gray-600);
+    transition: transform .18s;
+    display: inline-block; line-height: 1;
+  }
+  .chevron.up { transform: rotate(90deg); }
+  .sec-right { display: flex; align-items: center; gap: 6px; }
+  .count-badge {
+    background: var(--gray-200); color: var(--gray-600);
+    font-size: var(--fs-xs); font-weight: 600;
+    padding: 1px 6px; border-radius: 10px;
+  }
+  .sec-icon { font-size: 13px; color: var(--gray-400); cursor: pointer; }
+  .sec-icon:hover { color: var(--gray-800); }
+
+  .sec-body { display: block; }
+  .sec-body.hidden { display: none; }
+
+  /* ── Toolbar ── */
+  .tbl-toolbar {
+    padding: 5px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--gray-100);
+    gap: 8px;
+  }
+  .tbl-toolbar-left { display: flex; align-items: center; gap: 6px; }
+  .search-box {
+    padding: 3px 8px;
+    border: 1px solid var(--gray-200);
+    border-radius: 3px;
+    font-size: var(--fs-sm);
+    width: 170px;
+    outline: none;
+    color: var(--gray-800);
+  }
+  .search-box:focus { border-color: var(--teal); }
+  .icon-btn {
+    background: none; border: none;
+    cursor: pointer; padding: 3px;
+    color: var(--gray-400); font-size: 14px;
+  }
+  .icon-btn:hover { color: var(--gray-800); }
+
+  /* ── Tables ── */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--gray-50); }
+  th {
+    padding: 5px 10px;
+    text-align: left;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--gray-600);
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+    letter-spacing: .3px;
+  }
+  td {
+    padding: 5px 10px;
+    font-size: var(--fs-sm);
+    color: var(--gray-800);
+    border-bottom: 1px solid var(--gray-100);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #f7fffe; }
+  .total-row td {
+    font-weight: 700;
+    background: var(--gray-50) !important;
+    border-top: 2px solid var(--gray-200);
+    border-bottom: none;
+  }
+  .null { color: var(--gray-400); }
+
+  /* ── Footer / Pagination ── */
+  .tbl-footer {
+    padding: 5px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--gray-100);
+    background: var(--gray-50);
+  }
+  .tbl-count { font-size: var(--fs-xs); color: var(--gray-600); }
+  .pagination { display: flex; gap: 3px; align-items: center; }
+  .pg-btn {
+    min-width: 22px; height: 22px;
+    padding: 0 5px;
+    border: 1px solid var(--gray-200);
+    background: #fff;
+    font-size: var(--fs-xs); cursor: pointer;
+    border-radius: 2px; color: var(--gray-600);
+  }
+  .pg-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+  .pg-btn:hover:not(.active) { background: var(--gray-100); }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block;
+    padding: 1px 7px; border-radius: 10px;
+    font-size: var(--fs-xs); font-weight: 600;
+    line-height: 1.7;
+  }
+  .b-blue   { background: var(--blue-badge);   color: var(--blue-text); }
+  .b-green  { background: var(--green-badge);  color: var(--green-text); }
+  .b-red    { background: var(--orange-badge); color: var(--orange-text); }
+  .b-amber  { background: var(--amber-badge);  color: var(--amber-text); }
+  .b-gray   { background: var(--gray-100);     color: var(--gray-600); }
+  .b-teal   { background: #d2f5ee; color: #0d7a5f; }
+
+  /* ── Dot status ── */
+  .dot {
+    display: inline-block; width: 7px; height: 7px;
+    border-radius: 50%; margin-right: 4px; vertical-align: middle;
+  }
+  .dot-green  { background: #34a853; }
+  .dot-red    { background: #ea4335; }
+  .dot-orange { background: #fbbc04; }
+  .dot-gray   { background: var(--gray-400); }
+
+  /* ── Questions section ── */
+  .q-open-tag {
+    background: #fce8e6; color: var(--orange-text);
+    font-size: var(--fs-xs); font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+  }
+
+  /* ── Responsive hint ── */
+  @media (max-width: 768px) {
+    .hdr-actions { display: none; }
+    .info-lbl { width: 130px; min-width: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ TOP NAV ═══════════════════════ -->
+<nav class="topnav">
+  <a href="#">Cap Table</a>
+  <span class="sep">›</span>
+  <a href="#">Cap Tables</a>
+  <span class="sep">›</span>
+  <span class="current">Cap Table Details</span>
+</nav>
+
+<!-- ═══════════════════════ PAGE HEADER ═══════════════════════ -->
+<div class="page-hdr">
+  <div class="page-title">Cap Table Details</div>
+  <div class="hdr-actions">
+    <button class="btn btn-gray">Download Excel</button>
+    <button class="btn btn-gray">Download Source</button>
+    <button class="btn btn-gray">Reject to Build</button>
+    <button class="btn btn-gray">Operate</button>
+    <button class="btn btn-red">Disapprove</button>
+    <button class="btn btn-teal">Create New Cap Table</button>
+    <button class="btn btn-teal">Add Fair Market Valuation</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE BODY ═══════════════════════ -->
+<div class="page-body">
+
+  <!-- ── Company Metadata ── -->
+  <div class="info-card">
+    <div class="info-row">
+      <div class="info-lbl">Company</div>
+      <div class="info-val"><a href="#">AcmeCo Inc.</a></div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Industry</div>
+      <div class="info-val">Software &amp; Computer Services</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Currency</div>
+      <div class="info-val">USD</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Valuation</div>
+      <div class="info-val">$12,000,000</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Total Capital Committed</div>
+      <div class="info-val">$5,240,000</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Total Fully Diluted Shares</div>
+      <div class="info-val">12,400,000</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Approved</div>
+      <div class="info-val"><span class="dot dot-green"></span>Yes</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Notes</div>
+      <div class="info-val" style="color:var(--gray-600); font-style:italic;">
+        Reconciliation complete. Fill-back applied on 2024-06-01.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       1. SUMMARY
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-summary">
+    <div class="sec-hdr" onclick="toggle('sec-summary')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Summary
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">5</span>
+        <span class="sec-icon" title="Settings">⚙</span>
+        <span class="sec-icon" title="View">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Security</th>
+              <th>Shares Authorized</th>
+              <th>Shares Issued</th>
+              <th>Fully Diluted Shares</th>
+              <th>Capital Committed</th>
+              <th>Ownership</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge b-blue">Common Stock</span></td>
+              <td>10,000,000</td><td>6,500,000</td><td>6,500,000</td>
+              <td>$1,500,000</td><td>52.42%</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-green">Preferred Stock</span></td>
+              <td>5,000,000</td><td>3,000,000</td><td>3,000,000</td>
+              <td>$3,000,000</td><td>24.19%</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-amber">Options</span></td>
+              <td>2,000,000</td><td>1,500,000</td><td>1,800,000</td>
+              <td><span class="null">—</span></td><td>14.52%</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-gray">Warrants</span></td>
+              <td>500,000</td><td>300,000</td><td>400,000</td>
+              <td><span class="null">—</span></td><td>3.23%</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-teal">Convertibles</span></td>
+              <td><span class="null">—</span></td><td><span class="null">—</span></td>
+              <td>700,000</td><td>$740,000</td><td>5.65%</td>
+            </tr>
+            <tr class="total-row">
+              <td>Total</td>
+              <td>17,500,000</td><td>11,300,000</td><td>12,400,000</td>
+              <td>$5,240,000</td><td>100.00%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       2. COMMON STOCK CLASSES
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-cs-classes">
+    <div class="sec-hdr" onclick="toggle('sec-cs-classes')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Common Stock Classes
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">3</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Class Name</th>
+              <th>Total Number of Common Stock Class</th>
+              <th>Shares Authorized</th>
+              <th>Shares Issued</th>
+              <th>Fully Diluted Shares</th>
+              <th>Capital Committed</th>
+              <th>Ownership</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Class A</td><td>4,500,000</td><td>6,000,000</td><td>4,500,000</td><td>4,500,000</td><td>$900,000</td><td>36.29%</td></tr>
+            <tr><td>Class B</td><td>1,500,000</td><td>3,000,000</td><td>1,500,000</td><td>1,500,000</td><td>$450,000</td><td>12.10%</td></tr>
+            <tr><td>Class C</td><td>500,000</td><td>1,000,000</td><td>500,000</td><td>500,000</td><td>$150,000</td><td>4.03%</td></tr>
+            <tr class="total-row">
+              <td>Total</td><td>6,500,000</td><td>10,000,000</td><td>6,500,000</td><td>6,500,000</td><td>$1,500,000</td><td>52.42%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       3. PREFERRED STOCK CLASSES
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-ps-classes">
+    <div class="sec-hdr" onclick="toggle('sec-ps-classes')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Preferred Stock Classes
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">3</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Class Name</th>
+              <th>Total Number of Preferred Stock Class</th>
+              <th>Shares Authorized</th>
+              <th>Shares Issued</th>
+              <th>Fully Diluted Shares</th>
+              <th>Capital Committed</th>
+              <th>Ownership</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Series A</td><td>1,500,000</td><td>2,000,000</td><td>1,500,000</td><td>1,500,000</td><td>$1,500,000</td><td>12.10%</td></tr>
+            <tr><td>Series B</td><td>1,000,000</td><td>2,000,000</td><td>1,000,000</td><td>1,000,000</td><td>$1,000,000</td><td>8.06%</td></tr>
+            <tr><td>Series C</td><td>500,000</td><td>1,000,000</td><td>500,000</td><td>500,000</td><td>$500,000</td><td>4.03%</td></tr>
+            <tr class="total-row">
+              <td>Total</td><td>3,000,000</td><td>5,000,000</td><td>3,000,000</td><td>3,000,000</td><td>$3,000,000</td><td>24.19%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(id) {
+    const elem = document.getElementById(id);
+    const body = elem.querySelector('.sec-body');
+    const chevron = elem.querySelector('.chevron');
+    body.classList.toggle('hidden');
+    chevron.classList.toggle('up');
+  }
+</script>
+
+</body>
+</html>
