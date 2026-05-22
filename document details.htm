@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cap Table Document Details</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal:        #1DC9A4;
+    --teal-dark:   #17a688;
+    --red:         #e74c3c;
+    --gray-50:     #f8f9fa;
+    --gray-100:    #f1f3f4;
+    --gray-200:    #e8eaed;
+    --gray-400:    #bdc1c6;
+    --gray-600:    #80868b;
+    --gray-800:    #3c4043;
+    --gray-900:    #202124;
+    --blue-badge:  #e8f0fe;
+    --blue-text:   #1a73e8;
+    --green-badge: #e6f4ea;
+    --green-text:  #137333;
+    --red-badge:   #fce8e6;
+    --red-text:    #c5221f;
+    --amber-badge: #fef9c3;
+    --amber-text:  #92400e;
+    --purple-badge:#f3e8ff;
+    --purple-text: #7c3aed;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --fs-xs:  10px;
+    --fs-sm:  11px;
+    --fs-base:12px;
+    --fs-md:  13px;
+  }
+
+  body {
+    font-family: var(--font);
+    font-size: var(--fs-base);
+    color: var(--gray-800);
+    background: var(--gray-100);
+    min-height: 100vh;
+  }
+
+  /* ── Nav ── */
+  .topnav {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    height: 36px;
+    display: flex; align-items: center;
+    padding: 0 16px; gap: 4px;
+    font-size: var(--fs-sm);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topnav a { color: var(--teal); text-decoration: none; }
+  .topnav a:hover { text-decoration: underline; }
+  .topnav .sep { color: var(--gray-400); font-size: 14px; }
+  .topnav .cur { color: var(--gray-600); }
+
+  /* ── Page header ── */
+  .page-hdr {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 8px 16px;
+    display: flex; align-items: center;
+    justify-content: space-between; gap: 8px;
+  }
+  .page-title { font-size: var(--fs-md); font-weight: 600; color: var(--gray-900); }
+  .hdr-actions { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+
+  .btn {
+    padding: 4px 11px; border: none; border-radius: 3px;
+    font-size: var(--fs-xs); font-weight: 500; cursor: pointer;
+    white-space: nowrap; line-height: 1.7;
+  }
+  .btn-teal  { background: var(--teal); color: #fff; }
+  .btn-teal:hover { background: var(--teal-dark); }
+  .btn-gray  { background: var(--gray-200); color: var(--gray-800); }
+  .btn-gray:hover { background: var(--gray-400); }
+  .btn-red   { background: var(--red); color: #fff; }
+  .btn-red:hover { background: #c0392b; }
+  .btn-icon  {
+    padding: 3px 9px; background: var(--gray-50);
+    border: 1px solid var(--gray-200); border-radius: 3px;
+    cursor: pointer; font-size: 14px; color: var(--gray-600);
+    line-height: 1.5;
+  }
+  .btn-icon:hover { background: var(--gray-200); }
+
+  /* ── Demo bar ── */
+  .demo-bar {
+    background: #fffde7;
+    border-bottom: 1px solid #f9a825;
+    padding: 5px 16px;
+    display: flex; align-items: center; gap: 14px;
+    font-size: var(--fs-sm); color: #7b5800;
+    flex-wrap: wrap;
+  }
+  .demo-bar b { font-weight: 700; }
+  .demo-bar label { font-weight: 600; white-space: nowrap; }
+  .demo-bar select {
+    padding: 2px 7px; border: 1px solid #f9a825;
+    border-radius: 3px; background: #fff;
+    font-size: var(--fs-sm); color: var(--gray-800); cursor: pointer;
+  }
+
+  /* ── Body ── */
+  .page-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+
+  /* ── Info card ── */
+  .info-card {
+    background: #fff;
+    border: 1px solid var(--gray-200); border-radius: 2px;
+  }
+  .info-row {
+    display: flex; align-items: flex-start;
+    border-bottom: 1px solid var(--gray-100); min-height: 28px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-lbl {
+    width: 200px; min-width: 160px;
+    padding: 5px 12px;
+    font-size: var(--fs-sm); color: var(--gray-600); font-weight: 500;
+  }
+  .info-val {
+    padding: 5px 12px;
+    font-size: var(--fs-sm); color: var(--gray-800); flex: 1;
+  }
+  .info-val a { color: var(--teal); text-decoration: none; }
+  .info-val a:hover { text-decoration: underline; }
+
+  /* ── Section ── */
+  .section {
+    background: #fff;
+    border: 1px solid var(--gray-200); border-radius: 2px; overflow: hidden;
+  }
+  .sec-hdr {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 10px; height: 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; user-select: none;
+  }
+  .sec-hdr:hover { background: var(--gray-100); }
+  .sec-title {
+    display: flex; align-items: center; gap: 6px;
+    font-size: var(--fs-sm); font-weight: 600; color: var(--gray-900);
+  }
+  .chevron {
+    font-size: 13px; color: var(--gray-600);
+    transition: transform .18s; display: inline-block; line-height: 1;
+  }
+  .chevron.open { transform: rotate(90deg); }
+  .sec-right { display: flex; align-items: center; gap: 5px; }
+  .sec-ico { font-size: 13px; color: var(--gray-400); cursor: pointer; }
+  .sec-ico:hover { color: var(--gray-800); }
+  .sec-body { display: block; }
+  .sec-body.hidden { display: none; }
+
+  /* ── JSON block ── */
+  .json-pre {
+    background: #1e2329;
+    padding: 12px 14px;
+    font-family: 'Courier New', monospace;
+    font-size: 11px; color: #abb2bf;
+    line-height: 1.65;
+    overflow-x: auto; max-height: 320px; overflow-y: auto;
+  }
+  .jk  { color: #e5c07b; }  /* key */
+  .js  { color: #98c379; }  /* string */
+  .jn  { color: #d19a66; }  /* number */
+  .jb  { color: #56b6c2; }  /* bool */
+  .jnu { color: #c678dd; }  /* null */
+
+  /* ── KV table (equity / vesting details) ── */
+  .type-bar {
+    padding: 6px 12px;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .type-lbl { font-size: var(--fs-xs); color: var(--gray-600); font-weight: 600; font-family: monospace; }
+
+  .kv { width: 100%; border-collapse: collapse; }
+  .kv tr { border-bottom: 1px solid var(--gray-100); }
+  .kv tr:last-child { border-bottom: none; }
+  .kv tbody tr:hover td { background: #f7fffe; }
+
+  .kv td:first-child {
+    width: 280px; min-width: 180px;
+    padding: 5px 13px 5px 14px;
+    font-size: var(--fs-sm); color: var(--gray-600); font-weight: 500;
+    vertical-align: top; line-height: 1.35;
+  }
+  .kv td:last-child {
+    padding: 5px 14px;
+    font-size: var(--fs-sm); color: var(--gray-800); vertical-align: top;
+  }
+  .field-key {
+    font-family: 'Courier New', monospace;
+    font-size: 9px; color: var(--gray-400);
+    font-weight: 400; display: block; margin-top: 1px;
+  }
+  .null-v { color: var(--gray-400); }
+
+  /* Milestone / sub-section header row */
+  .kv-sub-hdr td {
+    background: var(--gray-100) !important;
+    font-size: var(--fs-xs) !important; font-weight: 700 !important;
+    color: var(--gray-600) !important; text-transform: uppercase;
+    letter-spacing: .5px; padding: 4px 14px !important;
+    border-top: 1px solid var(--gray-200) !important;
+    border-bottom: 1px solid var(--gray-200) !important;
+  }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block; padding: 1px 7px; border-radius: 10px;
+    font-size: var(--fs-xs); font-weight: 600; line-height: 1.7;
+  }
+  .b-blue   { background: var(--blue-badge);   color: var(--blue-text); }
+  .b-green  { background: var(--green-badge);  color: var(--green-text); }
+  .b-red    { background: var(--red-badge);    color: var(--red-text); }
+  .b-amber  { background: var(--amber-badge);  color: var(--amber-text); }
+  .b-gray   { background: var(--gray-100);     color: var(--gray-600); }
+  .b-teal   { background: #d2f5ee;             color: #0d7a5f; }
+  .b-purple { background: var(--purple-badge); color: var(--purple-text); }
+
+  .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+  .dot-g { background: #34a853; }
+  .dot-r { background: #ea4335; }
+
+  /* warn value */
+  .warn-v { color: var(--red-text); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════ TOP NAV ══════════════ -->
+<nav class="topnav">
+  <a href="#">Cap Table</a>
+  <span class="sep">›</span>
+  <a href="#">Documents</a>
+  <span class="sep">›</span>
+  <span class="cur">Document Details</span>
+</nav>
+
+<!-- ══════════════ PAGE HEADER ══════════════ -->
+<div class="page-hdr">
+  <div class="page-title">Cap Table Document Details</div>
+  <div class="hdr-actions">
+    <button class="btn btn-gray">Download Source</button>
+    <button class="btn btn-teal">Approve</button>
+    <button class="btn btn-red">Disapprove</button>
+    <button class="btn-icon" title="Edit document">✏</button>
+  </div>
+</div>
+
+<!-- ══════════════ DEMO SELECTOR BAR ══════════════ -->
+<div class="demo-bar">
+  <b>⚡ Demo switcher:</b>
+  <label for="selEquity">Equity Class:</label>
+  <select id="selEquity" onchange="applyEquity()">
+    <option value="common_stock">Common Stock</option>
+    <option value="coi">Certificate of Incorporation</option>
+    <option value="preferred_stock">Preferred Stock</option>
+    <option value="stock_option">Stock Option</option>
+    <option value="warrant">Warrant</option>
+    <option value="safe">SAFE Agreements</option>
+    <option value="convertible_note">Convertible Notes</option>
+    <option value="rsa_rsu">Restricted Stock (RSA &amp; RSU)</option>
+    <option value="piu">Incentive Units / Profits Interests (PIU)</option>
+  </select>
+  <label for="selVesting">Vesting Type:</label>
+  <select id="selVesting" onchange="applyVesting()">
+    <option value="time_based">time_based</option>
+    <option value="basic">basic</option>
+    <option value="milestones">milestones</option>
+    <option value="hybrid">hybrid</option>
+  </select>
+</div>
+
+<!-- ══════════════ PAGE BODY ══════════════ -->
+<div class="page-body">
+
+  <!-- Document Metadata -->
+  <div class="info-card">
+    <div class="info-row">
+      <div class="info-lbl">Company</div>
+      <div class="info-val"><a href="#">AcmeCo, Inc.</a></div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Document Type</div>
+      <div class="info-val" id="metaDocType">Stock Certificate</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Equity Type</div>
+      <div class="info-val" id="metaEquityBadge">
+        <span class="badge b-blue">Common Stock</span>
+      </div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Approved</div>
+      <div class="info-val"><span class="dot dot-g"></span>Yes</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">ID</div>
+      <div class="info-val" style="font-family:monospace;font-size:11px;color:var(--gray-600)">DOC-2024-CAP-001</div>
+    </div>
+  </div>
+
+  <!-- JSON Output -->
+  <div class="section" id="sec-json">
+    <div class="sec-hdr" onclick="tog('sec-json')">
+      <div class="sec-title">
+        <span class="chevron open">›</span>
+        Data — JSON Output
+      </div>
+      <div class="sec-right">
+        <span class="sec-ico" title="Copy">⧉</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <pre class="json-pre" id="jsonOut">Loading…</pre>
+    </div>
+  </div>
+
+  <!-- Equity Information -->
+  <div class="section" id="sec-equity">
+    <div class="sec-hdr" onclick="tog('sec-equity')">
+      <div class="sec-title">
+        <span class="chevron open">›</span>
+        Equity Information
+      </div>
+      <div class="sec-right">
+        <span class="sec-ico">⚙</span>
+        <span class="sec-ico">👁</span>
+      </div>
+    </div>
+    <div class="sec-body" id="equityBody"><!-- filled by JS --></div>
+  </div>
+
+  <!-- Vesting Schedule -->
+  <div class="section" id="sec-vesting">
+    <div class="sec-hdr" onclick="tog('sec-vesting')">
+      <div class="sec-title">
+        <span class="chevron open">›</span>
+        Vesting Schedule
+      </div>
+      <div class="sec-right">
+        <span class="sec-ico">⚙</span>
+        <span class="sec-ico">👁</span>
+      </div>
+    </div>
+    <div class="sec-body" id="vestingBody"><!-- filled by JS --></div>
+  </div>
+
+</div>
+
+<!-- ══════════════ SCRIPTS ══════════════ -->
+<script>
+/* ──────────────────────────────────────────
+   METADATA MAPS
+────────────────────────────────────────── */
+const BADGE_MAP = {
+  coi:              ['b-gray',   'Certificate of Incorporation'],
+  common_stock:     ['b-blue',   'Common Stock'],
+  preferred_stock:  ['b-green',  'Preferred Stock'],
+  stock_option:     ['b-amber',  'Stock Option'],
+  warrant:          ['b-teal',   'Warrant'],
+  safe:             ['b-teal',   'SAFE Agreement'],
+  convertible_note: ['b-amber',  'Convertible Note'],
+  rsa_rsu:          ['b-purple', 'Restricted Stock (RSA &amp; RSU)'],
+  piu:              ['b-purple', 'Incentive Units / PIU'],
+};
+
+const DOC_TYPE_MAP = {
+  coi:              'Certificate of Incorporation',
+  common_stock:     'Stock Certificate',
+  preferred_stock:  'Stock Purchase Agreement',
+  stock_option:     'Option Grant Agreement',
+  warrant:          'Warrant Agreement',
+  safe:             'SAFE Agreement',
+  convertible_note: 'Convertible Note Agreement',
+  rsa_rsu:          'Restricted Stock Agreement',
+  piu:              'PIU Grant Agreement',
+};
+
+const NO_VESTING = ['coi', 'safe', 'convertible_note'];
+
+/* ──────────────────────────────────────────
+   EQUITY DATA
+────────────────────────────────────────── */
+const EQ = {
+  coi: {
+    rows: [
+      ['Company legal name',           'company_legal_name',       'AcmeCo, Inc.'],
+      ['Incorporation jurisdiction',   'jurisdiction',             'Delaware, USA'],
+      ['Incorporation date',           'incorporation_date',       '2018-11-15'],
+      ['Entity type',                  'entity_type',              'C-Corporation'],
+      ['Total authorized shares',      'total_authorized_shares',  '20,000,000'],
+      ['Authorized shares by class',   'authorized_by_class',      '15,000,000 Common + 5,000,000 Preferred'],
+      ['Par value',                    'par_value',                '$0.0001'],
+      ['Stock classes / series',       'stock_classes',            'Class A Common, Class B Common, Series A Preferred'],
+      ['Rights &amp; preferences summary', 'rights_summary',       '1:1 voting; Series A 1× liquidation preference, non-participating'],
+      ['Registered office / agent',    'registered_office',        'Corporation Trust Center, 1209 Orange St, Wilmington DE 19801'],
+      ['Board size / range',           'board_size',               '3 – 9 directors'],
+      ['Filing / effective date',      'filing_date',              '2018-11-15'],
+    ]
+  },
+  common_stock: {
+    rows: [
+      ['Shareholder name',             'shareholder_name',         'John Smith'],
+      ['Shareholder type',             'shareholder_type',         'Individual'],
+      ['Class name',                   'class_name',               'Class A Common Stock'],
+      ['Number of shares issued',      'shares_issued',            '1,000,000'],
+      ['Price per share',              'price_per_share',          '$0.10'],
+      ['Par value',                    'par_value',                '$0.0001'],
+      ['Capital committed',            'capital_committed',        '$100,000'],
+      ['Issue date',                   'issue_date',               '2019-01-15'],
+      ['Certificate / share name',     'certificate_name',         'CS-2019-001'],
+      ['Vesting schedule',             'has_vesting',              '<span class="badge b-green">Yes</span>'],
+      ['Vesting start date',           'vesting_start_date',       '2019-01-15'],
+      ['Vesting restrictions',         'restriction_type',         'Standard 4-year / 1-year cliff'],
+      ['Repurchase right',             'repurchase_right',         'Yes — unvested shares at cost'],
+      ['83(b) election filed',         'section_83b_filed',        '<span class="badge b-green">Yes</span>'],
+      ['Transfer restrictions / ROFR', 'transfer_restrictions',    'ROFR + co-sale rights held by company'],
+    ]
+  },
+  preferred_stock: {
+    rows: [
+      ['Shareholder name',             'shareholder_name',         'Acme Ventures LLC'],
+      ['Series name',                  'series_name',              'Series A Preferred'],
+      ['Number of shares issued',      'shares_issued',            '1,500,000'],
+      ['Original issue price (OIP)',   'original_issue_price',     '$1.00'],
+      ['Aggregate investment',         'aggregate_investment',     '$1,500,000'],
+      ['Issue date',                   'issue_date',               '2021-03-10'],
+      ['Pre-money valuation',          'pre_money_valuation',      '$8,000,000'],
+      ['Post-money valuation',         'post_money_valuation',     '$9,500,000'],
+      ['Conversion rate',              'conversion_rate',          '1:1'],
+      ['Liquidation preference',       'liquidation_preference',   '$1,500,000'],
+      ['Liquidation multiple',         'liquidation_multiple',     '1×'],
+      ['Seniority level',              'liquidation_seniority',    'Senior to all Common'],
+      ['Participation rights',         'participating',            'Non-participating'],
+      ['Participation cap',            'participation_cap',        'N/A'],
+      ['Dividend rate',                'dividend_rate_pct',        '8%'],
+      ['Dividend type',                'dividend_type',            'Cumulative, non-compounding'],
+      ['Dividend frequency',           'dividend_frequency',       'Annual'],
+      ['Anti-dilution protection',     'anti_dilution',            'Broad-based weighted average'],
+      ['Voting rights',                'voting_rights',            'As-converted to Common (1:1)'],
+      ['Pro-rata / pre-emptive rights','pro_rata_rights',          'Yes — major investors ($500K+)'],
+      ['Redemption rights',            'redemption_rights',        'After 5 years by majority Preferred vote'],
+    ]
+  },
+  stock_option: {
+    rows: [
+      ['Grantee / shareholder',        'grantee_name',             'Carol White'],
+      ['Plan Name',                    'plan_name',                '2020 Equity Incentive Plan'],
+      ['Option class name',            'option_class_name',        'ISO Pool 2020'],
+      ['Units reserved (pool)',        'units_reserved_in_plan',   '2,000,000'],
+      ['Number of options issued',     'options_issued',           '250,000'],
+      ['Exercise price (strike)',      'exercise_price',           '$0.42'],
+      ['Date of issuance (grant date)','grant_date',               '2022-01-01'],
+      ['Option type',                  'option_type',              '<span class="badge b-blue">ISO</span>'],
+      ['Expiration date',              'expiration_date',          '2032-01-01'],
+      ['Option name / grant ID',       'grant_id',                 'OPT-2022-001'],
+      ['Anti-dilution provision',      'anti_dilution',            'Standard proportional adjustment for stock splits'],
+      ['Vesting schedule',             'has_vesting',              '<span class="badge b-green">Yes</span>'],
+      ['Vesting plan',                 'vesting_plan_name',        '4yr / 1yr cliff (time-based)'],
+      ['Vesting restrictions',         'vesting_plan_ref',         'Standard time-based — see Vesting Schedule section'],
+      ['Vesting start date',           'vesting_start_date',       '2022-01-01'],
+      ['Early exercise',               'early_exercise_allowed',   '<span class="badge b-gray">No</span>'],
+      ['Post-termination exercise window','post_termination_window','90 days voluntary; 12 months death / disability'],
+      ['Change of control treatment',  'change_of_control',        'Single-trigger acceleration — 100%'],
+    ]
+  },
+  warrant: {
+    rows: [
+      ['Warrant holder',               'warrant_holder',           'First Bank LLC'],
+      ['Warrant class name',           'warrant_class_name',       'Warrant-2020-A'],
+      ['Number of warrants issued',    'warrants_issued',          '150,000'],
+      ['Underlying share class',       'underlying_class',         'Class A Common Stock'],
+      ['Exercise price',               'exercise_price',           '$0.50'],
+      ['Date of issuance',             'issue_date',               '2020-09-01'],
+      ['Expiration date',              'expiration_date',          '2030-09-01'],
+      ['Warrant name / ID',            'warrant_id',               'WRT-2020-001'],
+      ['Cashless exercise',            'cashless_exercise',        'Yes — net exercise permitted'],
+      ['Anti-dilution adjustments',    'anti_dilution',            'Yes — standard proportional adjustment'],
+      ['Vesting schedule',             'has_vesting',              '<span class="badge b-gray">No — fully vested at issuance</span>'],
+      ['Vesting start date',           'vesting_start_date',       '—'],
+      ['Trigger events',               'trigger_events',           'Bank loan covenant; Change of control'],
+    ]
+  },
+  safe: {
+    rows: [
+      ['Investor name',                'investor_name',            'Seed Capital Fund'],
+      ['Instrument / SAFE name',       'instrument_name',          'SAFE-2021-001'],
+      ['Purchase amount (principal)',  'purchase_amount',          '$150,000'],
+      ['Issue date',                   'issue_date',               '2021-08-01'],
+      ['SAFE type',                    'safe_type',                'Post-money SAFE'],
+      ['Valuation cap',                'valuation_cap',            '$5,000,000'],
+      ['Conversion discount',          'discount_rate_as_written', '20%'],
+      ['MFN clause',                   'mfn_clause',               '<span class="badge b-green">Yes</span>'],
+      ['Pro-rata rights',              'pro_rata_rights',          'Yes — major investor threshold $100K'],
+      ['Conversion trigger — equity financing','equity_financing_threshold','$1,000,000 qualified financing'],
+      ['Conversion trigger — liquidity event','liquidity_event_treatment','Converts at cap price or repays 1×'],
+      ['Dissolution payout',           'dissolution_event_treatment','Return of purchase amount first'],
+      ['Converts to',                  'converts_to',              'Series A Preferred Stock'],
+    ]
+  },
+  convertible_note: {
+    rows: [
+      ['Note holder',                  'note_holder',              'Bridge Lender LLC'],
+      ['Instrument name',              'instrument_name',          'CN-2022-001'],
+      ['Issue date',                   'issue_date',               '2022-01-15'],
+      ['Note type',                    'note_type',                'Senior Convertible Note'],
+      ['Principal',                    'principal',                '$250,000'],
+      ['Interest rate',                'interest_rate_pct',        '6.00%'],
+      ['Accrual frequency',            'accrual_frequency',        'Annual'],
+      ['Maturity date',                'maturity_date',            '<span class="warn-v">2024-01-15 ⚠ Matured</span>'],
+      ['Valuation cap',                'valuation_cap',            '$8,000,000'],
+      ['Conversion discount',          'conversion_discount_pct',  '15%'],
+      ['Conversion trigger amount',    'conversion_trigger_amount','$1,000,000'],
+      ['Early exit multiple',          'early_exit_multiple',      '1.5×'],
+      ['Converts to',                  'converts_to',              'Series A Preferred Stock'],
+      ['MFN clause',                   'mfn_clause',               '<span class="badge b-gray">No</span>'],
+      ['Subordination',                'subordination',            'Pari passu with other bridge notes'],
+      ['Repayment on maturity',        'maturity_behavior',        'Convert at lower of cap or 85% of QF price'],
+    ]
+  },
+  rsa_rsu: {
+    rows: [
+      ['Grant type',                   'grant_type',               '<span class="badge b-purple">RSU</span>'],
+      ['Grantee name',                 'grantee_name',             'Emma Wilson'],
+      ['Grant date',                   'grant_date',               '2023-01-01'],
+      ['Number of shares / units',     'quantity',                 '100,000'],
+      ['Purchase price (RSA only)',    'purchase_price',           'N/A (RSU)'],
+      ['Par value (RSA)',              'par_value',                'N/A (RSU)'],
+      ['Total vesting period',         'total_period_months',      '48 months'],
+      ['Vesting cliff',                'cliff_months',             '12 months'],
+      ['Vesting frequency',            'vest_frequency',           'Monthly'],
+      ['Vesting start date',           'vesting_start_date',       '2023-01-01'],
+      ['Repurchase right (RSA)',       'repurchase_right',         'N/A (RSU)'],
+      ['Settlement trigger (RSU)',     'rsu_trigger_type',         'Liquidity event or IPO'],
+      ['Settlement date (RSU)',        'rsu_settlement_date',      'Upon vest + liquidity event'],
+      ['Tax withholding method (RSU)', 'tax_withholding',          'Net settlement (shares withheld)'],
+      ['83(b) election filed (RSA)',   'section_83b_filed',        'N/A (RSU)'],
+      ['Transfer restrictions',        'transfer_restrictions',    'Non-transferable prior to settlement'],
+      ['Acceleration',                 'acceleration',             'Double-trigger — 100% on CoC + involuntary termination'],
+    ]
+  },
+  piu: {
+    rows: [
+      ['Grantee name',                 'grantee_name',             'David Lee'],
+      ['Unit class',                   'unit_class',               'Class B Profits Interest Units'],
+      ['Number of units granted',      'units_granted',            '50,000'],
+      ['Threshold value (hurdle)',      'threshold_value',          '$10,000,000'],
+      ['Grant date',                   'grant_date',               '2022-07-01'],
+      ['Total vesting period',         'total_period_months',      '48 months'],
+      ['Vesting cliff',                'cliff_months',             '12 months'],
+      ['Vesting frequency',            'vest_frequency',           'Quarterly'],
+      ['Vesting start date',           'vesting_start_date',       '2022-07-01'],
+      ['Distribution waterfall tier',  'distribution_waterfall_tier','Tier 2 — after return of capital to Preferred'],
+      ['Capital account',              'capital_account_initial',  '$0 (profits interest — no initial capital)'],
+      ['83(b) election filed',         'section_83b_filed',        '<span class="badge b-green">Yes</span>'],
+      ['Forfeiture on termination',    'forfeiture_on_termination','Unvested forfeited; vested units retained'],
+      ['Transfer restrictions',        'transfer_restrictions',    'Board consent required'],
+      ['Change of control treatment',  'change_of_control_treatment','Single-trigger acceleration — 100%'],
+    ]
+  },
+};
+
+/* ──────────────────────────────────────────
+   VESTING DATA
+────────────────────────────────────────── */
+const VS = {
+  basic: {
+    badge: ['b-gray', 'basic'],
+    rows: [
+      ['Vesting Type',                     'vesting_type',                     'basic'],
+      ['Plan name',                         'vesting_plan_name',                '4-Year Standard Plan'],
+      ['Vesting period (months)',           'vesting_period_months',            '48'],
+      ['Cliff (months)',                    'cliff_months',                     '12'],
+      ['After cliff, vest every (months)', 'after_cliff_vest_every_months',    '1'],
+      ['Vesting start basis',              'vesting_start_basis',              'Grant Date'],
+      ['Vesting start date',               'vesting_start_date',               '2022-01-01'],
+    ]
+  },
+  time_based: {
+    badge: ['b-blue', 'time_based'],
+    rows: [
+      ['Vesting Type',                     'vesting_type',                                    'time_based'],
+      ['Plan name',                         'vesting_plan_name',                               '4yr Monthly Vest Plan'],
+      ['Length',                            'time_based.length_months',                        '48'],
+      ['Frequency',                         'time_based.frequency_months',                     '1'],
+      ['Cliff (Months)',                    'time_based.cliff_months',                         '12'],
+      ['Percentage at cliff',              'time_based.percentage_at_cliff',                  '25%'],
+      ['Shares at cliff',                  'time_based.shares_at_cliff',                      '62,500'],
+      ['Periodic installment — Value',     'time_based.periodic_installment.value',           '2.0833%'],
+      ['Periodic installment — Units',     'time_based.periodic_installment.units',           '5,208'],
+      ['Periodic installment — Frequency', 'time_based.periodic_installment.frequency_months','1'],
+    ]
+  },
+  milestones: {
+    badge: ['b-purple', 'milestones'],
+    planName: 'Milestone Incentive Plan 2022',
+    milestones: [
+      { title: 'MVP Launch',     trigger: 'Product MVP delivered and approved by Board', value: '25% — 62,500 shares' },
+      { title: 'Series A Close', trigger: 'Series A financing ≥ $2,000,000 closed',      value: '25% — 62,500 shares' },
+      { title: 'ARR $1M',        trigger: 'Annual recurring revenue reaches $1,000,000', value: '25% — 62,500 shares' },
+      { title: 'ARR $5M',        trigger: 'Annual recurring revenue reaches $5,000,000', value: '25% — 62,500 shares' },
+    ]
+  },
+  hybrid: {
+    badge: ['b-amber', 'hybrid'],
+    timeRows: [
+      ['Vesting Type',                     'vesting_type',                                           'hybrid'],
+      ['Plan name',                         'vesting_plan_name',                                      'Hybrid 2023 Plan'],
+      ['Length',                            'hybrid.time_elements.length_months',                     '48'],
+      ['Frequency',                         'hybrid.time_elements.frequency_months',                  '1'],
+      ['Cliff (Months)',                    'hybrid.time_elements.cliff_months',                      '12'],
+      ['Percentage at cliff',              'hybrid.time_elements.percentage_at_cliff',               '12.5%'],
+      ['Shares at cliff',                  'hybrid.time_elements.shares_at_cliff',                   '12,500'],
+      ['Periodic installment — Value',     'hybrid.time_elements.periodic_installment.value',        '1.0417%'],
+      ['Periodic installment — Units',     'hybrid.time_elements.periodic_installment.units',        '1,042'],
+      ['Periodic installment — Frequency', 'hybrid.time_elements.periodic_installment.frequency_months', '1'],
+    ],
+    milestones: [
+      { title: 'Product Launch', trigger: 'v1.0 released to production', value: '12.5% — 12,500 shares' },
+      { title: 'Series A Close', trigger: 'Series A ≥ $3,000,000',      value: '12.5% — 12,500 shares' },
+    ]
+  },
+};
+
+/* ──────────────────────────────────────────
+   JSON SAMPLES
+────────────────────────────────────────── */
+const JSON_SAMPLES = {
+  common_stock: `{
+  <span class="jk">"equity_class"</span>: <span class="js">"Common Stock"</span>,
+  <span class="jk">"shareholder_name"</span>: <span class="js">"John Smith"</span>,
+  <span class="jk">"shareholder_type"</span>: <span class="js">"Individual"</span>,
+  <span class="jk">"class_name"</span>: <span class="js">"Class A Common Stock"</span>,
+  <span class="jk">"shares_issued"</span>: <span class="jn">1000000</span>,
+  <span class="jk">"price_per_share"</span>: <span class="jn">0.10</span>,
+  <span class="jk">"par_value"</span>: <span class="jn">0.0001</span>,
+  <span class="jk">"capital_committed"</span>: <span class="jn">100000</span>,
+  <span class="jk">"issue_date"</span>: <span class="js">"2019-01-15"</span>,
+  <span class="jk">"certificate_name"</span>: <span class="js">"CS-2019-001"</span>,
+  <span class="jk">"has_vesting"</span>: <span class="jb">true</span>,
+  <span class="jk">"vesting_start_date"</span>: <span class="js">"2019-01-15"</span>,
+  <span class="jk">"restriction_type"</span>: <span class="js">"Standard 4-year cliff"</span>,
+  <span class="jk">"repurchase_right"</span>: <span class="jb">true</span>,
+  <span class="jk">"section_83b_filed"</span>: <span class="jb">true</span>,
+  <span class="jk">"transfer_restrictions"</span>: <span class="js">"ROFR + co-sale"</span>
+}`,
+  coi: `{
+  <span class="jk">"equity_class"</span>: <span class="js">"Certificate of Incorporation / Article of Association"</span>,
+  <span class="jk">"company_legal_name"</span>: <span class="js">"AcmeCo, Inc."</span>,
+  <span class="jk">"jurisdiction"</span>: <span class="js">"Delaware, USA"</span>,
+  <span class="jk">"incorporation_date"</span>: <span class="js">"2018-11-15"</span>,
+  <span class="jk">"entity_type"</span>: <span class="js">"C-Corporation"</span>,
+  <span class="jk">"total_authorized_shares"</span>: <span class="jn">20000000</span>,
+  <span class="jk">"authorized_by_class"</span>: <span class="js">"15M Common + 5M Preferred"</span>,
+  <span class="jk">"par_value"</span>: <span class="jn">0.0001</span>,
+  <span class="jk">"stock_classes"</span>: <span class="js">"Class A Common, Class B Common, Series A Preferred"</span>,
+  <span class="jk">"rights_summary"</span>: <span class="js">"1:1 voting; Series A 1× liq pref"</span>,
+  <span class="jk">"registered_office"</span>: <span class="js">"1209 Orange St, Wilmington DE 19801"</span>,
+  <span class="jk">"board_size"</span>: <span class="js">"3-9 directors"</span>,
+  <span class="jk">"filing_date"</span>: <span class="js">"2018-11-15"</span>
+}`,
+  preferred_stock: `{
+  <span class="jk">"equity_class"</span>: <span class="js">"Preferred Stock"</span>,
+  <span class="jk">"shareholder_name"</span>: <span class="js">"Acme Ventures LLC"</span>,
+  <span class="jk">"series_name"</span>: <span class="js">"Series A Preferred"</span>,
+  <span class="jk">"shares_issued"</span>: <span class="jn">1500000</span>,
+  <span class="jk">"original_issue_price"</span>: <span class="jn">1.00</span>,
+  <span class="jk">"aggregate_investment"</span>: <span class="jn">1500000</span>,
+  <span class="jk">"issue_date"</span>: <span class="js">"2021-03-10"</span>,
+  <span class="jk">"pre_money_valuation"</span>: <span class="jn">8000000</span>,
+  <span class="jk">"post_money_valuation"</span>: <span class="jn">9500000</span>,
+  <span class="jk">"conversion_rate"</span>: <span class="js">"1:1"</span>,
+  <span class="jk">"liquidation_preference"</span>: <span class="jn">1500000</span>,
+  <span class="jk">"liquidation_multiple"</span>: <span class="jn">1</span>,
+  <span class="jk">"liquidation_seniority"</span>: <span class="js">"Senior to Common"</span>,
+  <span class="jk">"participating"</span>: <span class="jb">false</span>,
+  <span class="jk">"dividend_rate_pct"</span>: <span class="jn">8</span>,
+  <span class="jk">"anti_dilution"</span>: <span class="js">"Broad-based weighted average"</span>,
+  <span class="jk">"voting_rights"</span>: <span class="js">"As-converted 1:1"</span>
+}`,
+  stock_option: `{
+  <span class="jk">"equity_class"</span>: <span class="js">"Stock Option"</span>,
+  <span class="jk">"grantee_name"</span>: <span class="js">"Carol White"</span>,
+  <span class="jk">"plan_name"</span>: <span class="js">"2020 Equity Incentive Plan"</span>,
+  <span class="jk">"option_class_name"</span>: <span class="js">"ISO Pool 2020"</span>,
+  <span class="jk">"units_reserved_in_plan"</span>: <span class="jn">2000000</span>,
+  <span class="jk">"options_issued"</span>: <span class="jn">250000</span>,
+  <span class="jk">"exercise_price"</span>: <span class="jn">0.42</span>,
+  <span class="jk">"grant_date"</span>: <span class="js">"2022-01-01"</span>,
+  <span class="jk">"option_type"</span>: <span class="js">"ISO"</span>,
+  <span class="jk">"expiration_date"</span>: <span class="js">"2032-01-01"</span>,
+  <span class="jk">"grant_id"</span>: <span class="js">"OPT-2022-001"</span>,
+  <span class="jk">"has_vesting"</span>: <span class="jb">true</span>,
+  <span class="jk">"early_exercise_allowed"</span>: <span class="jb">false</span>,
+  <span class="jk">"post_termination_window"</span>: <span class="js">"90 days"</span>,
+  <span class="jk">"change_of_control"</span>: <span class="js">"Single-trigger 100%"</span>
+}`,
+  warrant: `{
+  <span class="jk">"equity_class"</span>: <span class="js">"Warrant"</span>,
+  <span class="jk">"warrant_holder"</span>: <span class="js">"First Bank LLC"</span>,
+  <span class="jk">"warrant_class_name"</span>: <span class="js">"Warrant-2020-A"</span>,
+  <span class="jk">"warrants_issued"</span>: <span class="jn">150000</span>,
+  <span class="jk">"underlying_class"</span>: <span class="js">"Class A Common Stock"</span>,
+  <span class="jk">"exercise_price"</span>: <span class="jn">0.50</span>,
+  <span class="jk">"issue_date"</span>: <span class="js">"2020-09-01"</span>,
+  <span class="jk">"expiration_date"</span>: <span class="js">"2030-09-01"</span>,
+  <span class="jk">"warrant_id"</span>: <span class="js">"WRT-2020-001"</span>,
+  <span class="jk">"cashless_exercise"</span>: <span class="jb">true</span>,
+  <span class="jk">"anti_dilution"</span>: <span class="jb">true</span>,
+  <span class="jk">"has_vesting"</span>: <span class="jb">false</span>,
+  <span class="jk">"trigger_events"</span>: <span class="js">"Bank loan covenant; Change of control"</span>
+}`,
+  safe: `{
+  <span class="jk">"equity_class"</span>: <span class="js">"SAFE Agreements"</span>,
+  <span class="jk">"investor_name"</span>: <span class="js">"Seed Capital Fund"</span>,
+  <span class="jk">"instrument_name"</span>: <span class="js">"SAFE-2021-001"</span>,
+  <span class="jk">"purchase_amount"</span>: <span class="jn">150000</span>,
+  <span class="jk">"issue_date"</span>: <span class="js">"2021-08-01"</span>,
+  <span class="jk">"safe_type"</span>: <span class="js">"Post-money SAFE"</span>,
+  <span class="jk">"valuation_cap"</span>: <span class="jn">5000000</span>,
+  <span class="jk">"discount_rate_as_written"</span>: <span class="jn">20</span>,
+  <span class="jk">"mfn_clause"</span>: <span class="jb">true</span>,
+  <span class="jk">"pro_rata_rights"</span>: <span class="jb">true</span>,
+  <span class="jk">"equity_financing_threshold"</span>: <span class="jn">1000000</span>,
+  <span class="jk">"liquidity_event_treatment"</span>: <span class="js">"Converts at cap or repays 1x"</span>,
+  <span class="jk">"dissolution_event_treatment"</span>: <span class="js">"Return purchase amount first"</span>,
+  <span class="jk">"converts_to"</span>: <span class="js">"Series A Preferred Stock"</span>
+}`,
+  convertible_note: `{
+  <span class="jk">"equity_class"</span>: <span class="js">"Convertible Notes"</span>,
+  <span class="jk">"note_holder"</span>: <span class="js">"Bridge Lender LLC"</span>,
+  <span class="jk">"instrument_name"</span>: <span class="js">"CN-2022-001"</span>,
+  <span class="jk">"issue_date"</span>: <span class="js">"2022-01-15"</span>,
+  <span class="jk">"note_type"</span>: <span class="js">"Senior Convertible Note"</span>,
+  <span class="jk">"principal"</span>: <span class="jn">250000</span>,
+  <span class="jk">"interest_rate_pct"</span>: <span class="jn">6.00</span>,
+  <span class="jk">"accrual_frequency"</span>: <span class="js">"Annual"</span>,
+  <span class="jk">"maturity_date"</span>: <span class="js">"2024-01-15"</span>,
+  <span class="jk">"valuation_cap"</span>: <span class="jn">8000000</span>,
+  <span class="jk">"conversion_discount_pct"</span>: <span class="jn">15</span>,
+  <span class="jk">"conversion_trigger_amount"</span>: <span class="jn">1000000</span>,
+  <span class="jk">"early_exit_multiple"</span>: <span class="jn">1.5</span>,
+  <span class="jk">"converts_to"</span>: <span class="js">"Series A Preferred Stock"</span>,
+  <span class="jk">"mfn_clause"</span>: <span class="jb">false</span>,
+  <span class="jk">"subordination"</span>: <span class="js">"Pari passu"</span>,
+  <span class="jk">"maturity_behavior"</span>: <span class="js">"Convert at lower of cap or 85% QF price"</span>
+}`,
+  rsa_rsu: `{
+  <span class="jk">"equity_class"</span>: <span class="js">"Restricted Stock (RSA &amp; RSU)"</span>,
+  <span class="jk">"grant_type"</span>: <span class="js">"RSU"</span>,
+  <span class="jk">"grantee_name"</span>: <span class="js">"Emma Wilson"</span>,
+  <span class="jk">"grant_date"</span>: <span class="js">"2023-01-01"</span>,
+  <span class="jk">"quantity"</span>: <span class="jn">100000</span>,
+  <span class="jk">"total_period_months"</span>: <span class="jn">48</span>,
+  <span class="jk">"cliff_months"</span>: <span class="jn">12</span>,
+  <span class="jk">"vest_frequency"</span>: <span class="js">"Monthly"</span>,
+  <span class="jk">"vesting_start_date"</span>: <span class="js">"2023-01-01"</span>,
+  <span class="jk">"rsu_trigger_type"</span>: <span class="js">"Liquidity event or IPO"</span>,
+  <span class="jk">"tax_withholding"</span>: <span class="js">"Net settlement"</span>,
+  <span class="jk">"transfer_restrictions"</span>: <span class="js">"Non-transferable prior to settlement"</span>,
+  <span class="jk">"acceleration"</span>: <span class="js">"Double-trigger 100%"</span>
+}`,
+  piu: `{
+  <span class="jk">"equity_class"</span>: <span class="js">"Incentive Units / Profits Interests (PIU)"</span>,
+  <span class="jk">"grantee_name"</span>: <span class="js">"David Lee"</span>,
+  <span class="jk">"unit_class"</span>: <span class="js">"Class B Profits Interest Units"</span>,
+  <span class="jk">"units_granted"</span>: <span class="jn">50000</span>,
+  <span class="jk">"threshold_value"</span>: <span class="jn">10000000</span>,
+  <span class="jk">"grant_date"</span>: <span class="js">"2022-07-01"</span>,
+  <span class="jk">"total_period_months"</span>: <span class="jn">48</span>,
+  <span class="jk">"cliff_months"</span>: <span class="jn">12</span>,
+  <span class="jk">"vest_frequency"</span>: <span class="js">"Quarterly"</span>,
+  <span class="jk">"distribution_waterfall_tier"</span>: <span class="js">"Tier 2"</span>,
+  <span class="jk">"capital_account_initial"</span>: <span class="jn">0</span>,
+  <span class="jk">"section_83b_filed"</span>: <span class="jb">true</span>,
+  <span class="jk">"forfeiture_on_termination"</span>: <span class="jb">true</span>,
+  <span class="jk">"change_of_control_treatment"</span>: <span class="js">"Single-trigger 100%"</span>
+}`,
+};
+
+/* ──────────────────────────────────────────
+   RENDERERS
+────────────────────────────────────────── */
+function row(label, key, val) {
+  const v = val || '<span class="null-v">—</span>';
+  return `<tr>
+    <td>${label}<span class="field-key">${key}</span></td>
+    <td>${v}</td>
+  </tr>`;
+}
+
+function subHdr(text) {
+  return `<tr class="kv-sub-hdr"><td colspan="2">${text}</td></tr>`;
+}
+
+function renderEquity(type) {
+  const d = EQ[type]; if (!d) return '';
+  const [cls, label] = BADGE_MAP[type];
+  return `
+    <div class="type-bar">
+      <span class="type-lbl">equity_class:</span>
+      <span class="badge ${cls}">${label}</span>
+    </div>
+    <table class="kv"><tbody>
+      ${d.rows.map(r => row(r[0], r[1], r[2])).join('')}
+    </tbody></table>`;
+}
+
+function renderVesting(type) {
+  const d = VS[type]; if (!d) return '';
+  const [cls, label] = d.badge;
+
+  if (type === 'basic' || type === 'time_based') {
+    return `
+      <div class="type-bar">
+        <span class="type-lbl">vesting_type:</span>
+        <span class="badge ${cls}">${label}</span>
+      </div>
+      <table class="kv"><tbody>
+        ${d.rows.map(r => row(r[0], r[1], r[2])).join('')}
+      </tbody></table>`;
+  }
+
+  if (type === 'milestones') {
+    let html = `
+      <div class="type-bar">
+        <span class="type-lbl">vesting_type:</span>
+        <span class="badge ${cls}">${label}</span>
+      </div>
+      <table class="kv"><tbody>
+        ${row('Vesting Type', 'vesting_type', 'milestones')}
+        ${row('Plan name',    'vesting_plan_name', d.planName)}`;
+    d.milestones.forEach((m, i) => {
+      html += `
+        ${subHdr('Milestone ' + (i + 1))}
+        ${row('Title',                    `milestones[${i}].milestone_title`,       m.title)}
+        ${row('Trigger description',      `milestones[${i}].trigger_description`,   m.trigger)}
+        ${row('Percentage or shares',     `milestones[${i}].percentage_or_shares`,  m.value)}`;
+    });
+    html += `</tbody></table>`;
+    return html;
+  }
+
+  if (type === 'hybrid') {
+    let html = `
+      <div class="type-bar">
+        <span class="type-lbl">vesting_type:</span>
+        <span class="badge ${cls}">${label}</span>
+      </div>
+      <table class="kv"><tbody>
+        ${d.timeRows.map(r => row(r[0], r[1], r[2])).join('')}`;
+    d.milestones.forEach((m, i) => {
+      html += `
+        ${subHdr('Milestone ' + (i + 1))}
+        ${row('Title',               `hybrid.milestone_elements[${i}].milestone_title`,      m.title)}
+        ${row('Trigger description', `hybrid.milestone_elements[${i}].trigger_description`,  m.trigger)}
+        ${row('Percentage or shares',`hybrid.milestone_elements[${i}].percentage_or_shares`, m.value)}`;
+    });
+    html += `</tbody></table>`;
+    return html;
+  }
+  return '';
+}
+
+/* ──────────────────────────────────────────
+   UPDATERS
+────────────────────────────────────────── */
+function applyEquity() {
+  const type = document.getElementById('selEquity').value;
+  const [cls, lbl] = BADGE_MAP[type];
+  document.getElementById('metaEquityBadge').innerHTML = `<span class="badge ${cls}">${lbl}</span>`;
+  document.getElementById('metaDocType').textContent   = DOC_TYPE_MAP[type] || '—';
+  document.getElementById('equityBody').innerHTML      = renderEquity(type);
+  document.getElementById('jsonOut').innerHTML         = JSON_SAMPLES[type] || '// No sample available';
+  document.getElementById('sec-vesting').style.display = NO_VESTING.includes(type) ? 'none' : '';
+}
+
+function applyVesting() {
+  const type = document.getElementById('selVesting').value;
+  document.getElementById('vestingBody').innerHTML = renderVesting(type);
+}
+
+function tog(id) {
+  const s = document.getElementById(id);
+  const b = s.querySelector('.sec-body');
+  const c = s.querySelector('.chevron');
+  const open = !b.classList.contains('hidden');
+  b.classList.toggle('hidden', open);
+  c.classList.toggle('open', !open);
+}
+
+/* ── Init ── */
+applyEquity();
+applyVesting();
+</script>
+</body>
+</html>

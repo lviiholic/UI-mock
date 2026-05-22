@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cap Table Details</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --teal:       #1DC9A4;
+    --teal-dark:  #17a688;
+    --red:        #e74c3c;
+    --gray-50:    #f8f9fa;
+    --gray-100:   #f1f3f4;
+    --gray-200:   #e8eaed;
+    --gray-400:   #bdc1c6;
+    --gray-600:   #80868b;
+    --gray-800:   #3c4043;
+    --gray-900:   #202124;
+    --blue-badge: #e8f0fe;
+    --blue-text:  #1a73e8;
+    --green-badge:#e6f4ea;
+    --green-text: #137333;
+    --orange-badge:#fce8e6;
+    --orange-text:#c5221f;
+    --amber-badge:#fef9c3;
+    --amber-text: #92400e;
+    --font:       -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --fs-xs:      10px;
+    --fs-sm:      11px;
+    --fs-base:    12px;
+    --fs-md:      13px;
+  }
+
+  body {
+    font-family: var(--font);
+    font-size: var(--fs-base);
+    color: var(--gray-800);
+    background: var(--gray-100);
+    min-height: 100vh;
+  }
+
+  /* ── Top Nav ── */
+  .topnav {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    height: 36px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 4px;
+    font-size: var(--fs-sm);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topnav a { color: var(--teal); text-decoration: none; }
+  .topnav a:hover { text-decoration: underline; }
+  .topnav .sep { color: var(--gray-400); font-size: 14px; }
+  .topnav .current { color: var(--gray-600); }
+
+  /* ── Page Header ── */
+  .page-hdr {
+    background: #fff;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .page-title { font-size: var(--fs-md); font-weight: 600; color: var(--gray-900); }
+  .hdr-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+
+  .btn {
+    padding: 4px 10px;
+    border: none;
+    border-radius: 3px;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    line-height: 1.6;
+  }
+  .btn-teal   { background: var(--teal);  color: #fff; }
+  .btn-teal:hover { background: var(--teal-dark); }
+  .btn-gray   { background: var(--gray-200); color: var(--gray-800); }
+  .btn-gray:hover { background: var(--gray-400); }
+  .btn-red    { background: var(--red); color: #fff; }
+  .btn-outline{ background: #fff; border: 1px solid var(--gray-200); color: var(--gray-800); }
+  .btn-sm     { padding: 3px 8px; font-size: var(--fs-xs); }
+
+  /* ── Layout ── */
+  .page-body { padding: 10px 14px; display: flex; flex-direction: column; gap: 6px; }
+
+  /* ── Info block (top metadata) ── */
+  .info-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 2px;
+  }
+  .info-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--gray-100);
+    min-height: 26px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-lbl {
+    width: 210px; min-width: 210px;
+    padding: 4px 12px;
+    font-size: var(--fs-sm);
+    color: var(--gray-600);
+    font-weight: 500;
+  }
+  .info-val {
+    padding: 4px 12px;
+    font-size: var(--fs-sm);
+    color: var(--gray-800);
+    flex: 1;
+  }
+  .info-val a { color: var(--teal); text-decoration: none; }
+  .info-val a:hover { text-decoration: underline; }
+
+  /* ── Section card ── */
+  .section {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .sec-hdr {
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+    padding: 0 10px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+  }
+  .sec-hdr:hover { background: var(--gray-100); }
+  .sec-title {
+    display: flex; align-items: center; gap: 6px;
+    font-size: var(--fs-sm); font-weight: 600; color: var(--gray-900);
+  }
+  .chevron {
+    font-size: 13px; color: var(--gray-600);
+    transition: transform .18s;
+    display: inline-block; line-height: 1;
+  }
+  .chevron.up { transform: rotate(90deg); }
+  .sec-right { display: flex; align-items: center; gap: 6px; }
+  .count-badge {
+    background: var(--gray-200); color: var(--gray-600);
+    font-size: var(--fs-xs); font-weight: 600;
+    padding: 1px 6px; border-radius: 10px;
+  }
+  .sec-icon { font-size: 13px; color: var(--gray-400); cursor: pointer; }
+  .sec-icon:hover { color: var(--gray-800); }
+
+  .sec-body { display: block; }
+  .sec-body.hidden { display: none; }
+
+  /* ── Toolbar ── */
+  .tbl-toolbar {
+    padding: 5px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--gray-100);
+    gap: 8px;
+  }
+  .tbl-toolbar-left { display: flex; align-items: center; gap: 6px; }
+  .search-box {
+    padding: 3px 8px;
+    border: 1px solid var(--gray-200);
+    border-radius: 3px;
+    font-size: var(--fs-sm);
+    width: 170px;
+    outline: none;
+    color: var(--gray-800);
+  }
+  .search-box:focus { border-color: var(--teal); }
+  .icon-btn {
+    background: none; border: none;
+    cursor: pointer; padding: 3px;
+    color: var(--gray-400); font-size: 14px;
+  }
+  .icon-btn:hover { color: var(--gray-800); }
+
+  /* ── Tables ── */
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: var(--gray-50); }
+  th {
+    padding: 5px 10px;
+    text-align: left;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    color: var(--gray-600);
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+    letter-spacing: .3px;
+  }
+  td {
+    padding: 5px 10px;
+    font-size: var(--fs-sm);
+    color: var(--gray-800);
+    border-bottom: 1px solid var(--gray-100);
+    white-space: nowrap;
+  }
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #f7fffe; }
+  .total-row td {
+    font-weight: 700;
+    background: var(--gray-50) !important;
+    border-top: 2px solid var(--gray-200);
+    border-bottom: none;
+  }
+  .null { color: var(--gray-400); }
+
+  /* ── Footer / Pagination ── */
+  .tbl-footer {
+    padding: 5px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-top: 1px solid var(--gray-100);
+    background: var(--gray-50);
+  }
+  .tbl-count { font-size: var(--fs-xs); color: var(--gray-600); }
+  .pagination { display: flex; gap: 3px; align-items: center; }
+  .pg-btn {
+    min-width: 22px; height: 22px;
+    padding: 0 5px;
+    border: 1px solid var(--gray-200);
+    background: #fff;
+    font-size: var(--fs-xs); cursor: pointer;
+    border-radius: 2px; color: var(--gray-600);
+  }
+  .pg-btn.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+  .pg-btn:hover:not(.active) { background: var(--gray-100); }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block;
+    padding: 1px 7px; border-radius: 10px;
+    font-size: var(--fs-xs); font-weight: 600;
+    line-height: 1.7;
+  }
+  .b-blue   { background: var(--blue-badge);   color: var(--blue-text); }
+  .b-green  { background: var(--green-badge);  color: var(--green-text); }
+  .b-red    { background: var(--orange-badge); color: var(--orange-text); }
+  .b-amber  { background: var(--amber-badge);  color: var(--amber-text); }
+  .b-gray   { background: var(--gray-100);     color: var(--gray-600); }
+  .b-teal   { background: #d2f5ee; color: #0d7a5f; }
+
+  /* ── Dot status ── */
+  .dot {
+    display: inline-block; width: 7px; height: 7px;
+    border-radius: 50%; margin-right: 4px; vertical-align: middle;
+  }
+  .dot-green  { background: #34a853; }
+  .dot-red    { background: #ea4335; }
+  .dot-orange { background: #fbbc04; }
+  .dot-gray   { background: var(--gray-400); }
+
+  /* ── Questions section ── */
+  .q-open-tag {
+    background: #fce8e6; color: var(--orange-text);
+    font-size: var(--fs-xs); font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+  }
+
+  /* ── Responsive hint ── */
+  @media (max-width: 768px) {
+    .hdr-actions { display: none; }
+    .info-lbl { width: 130px; min-width: 130px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ TOP NAV ═══════════════════════ -->
+<nav class="topnav">
+  <a href="#">Cap Table</a>
+  <span class="sep">›</span>
+  <a href="#">Cap Tables</a>
+  <span class="sep">›</span>
+  <span class="current">Cap Table Details</span>
+</nav>
+
+<!-- ═══════════════════════ PAGE HEADER ═══════════════════════ -->
+<div class="page-hdr">
+  <div class="page-title">Cap Table Details</div>
+  <div class="hdr-actions">
+    <button class="btn btn-gray">Download Excel</button>
+    <button class="btn btn-gray">Download Source</button>
+    <button class="btn btn-gray">Reject to Build</button>
+    <button class="btn btn-gray">Operate</button>
+    <button class="btn btn-red">Disapprove</button>
+    <button class="btn btn-teal">Create New Cap Table</button>
+    <button class="btn btn-teal">Add Fair Market Valuation</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════ PAGE BODY ═══════════════════════ -->
+<div class="page-body">
+
+  <!-- ── Company Metadata ── -->
+  <div class="info-card">
+    <div class="info-row">
+      <div class="info-lbl">Company</div>
+      <div class="info-val"><a href="#">AcmeCo Inc.</a></div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Industry</div>
+      <div class="info-val">Software &amp; Computer Services</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Currency</div>
+      <div class="info-val">USD</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Valuation</div>
+      <div class="info-val">$12,000,000</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Total Capital Committed</div>
+      <div class="info-val">$5,240,000</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Total Fully Diluted Shares</div>
+      <div class="info-val">12,400,000</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Approved</div>
+      <div class="info-val"><span class="dot dot-green"></span>Yes</div>
+    </div>
+    <div class="info-row">
+      <div class="info-lbl">Notes</div>
+      <div class="info-val" style="color:var(--gray-600); font-style:italic;">
+        Reconciliation complete. Fill-back applied on 2024-06-01.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       1. SUMMARY
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-summary">
+    <div class="sec-hdr" onclick="toggle('sec-summary')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Summary
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">5</span>
+        <span class="sec-icon" title="Settings">⚙</span>
+        <span class="sec-icon" title="View">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Security</th>
+              <th>Shares Authorized</th>
+              <th>Shares Issued</th>
+              <th>Fully Diluted Shares</th>
+              <th>Capital Committed</th>
+              <th>Ownership</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge b-blue">Common Stock</span></td>
+              <td>10,000,000</td><td>6,500,000</td><td>6,500,000</td>
+              <td>$1,500,000</td><td>52.42%</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-green">Preferred Stock</span></td>
+              <td>5,000,000</td><td>3,000,000</td><td>3,000,000</td>
+              <td>$3,000,000</td><td>24.19%</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-amber">Options</span></td>
+              <td>2,000,000</td><td>1,500,000</td><td>1,800,000</td>
+              <td><span class="null">—</span></td><td>14.52%</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-gray">Warrants</span></td>
+              <td>500,000</td><td>300,000</td><td>400,000</td>
+              <td><span class="null">—</span></td><td>3.23%</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-teal">Convertibles</span></td>
+              <td><span class="null">—</span></td><td><span class="null">—</span></td>
+              <td>700,000</td><td>$740,000</td><td>5.65%</td>
+            </tr>
+            <tr class="total-row">
+              <td>Total</td>
+              <td>17,500,000</td><td>11,300,000</td><td>12,400,000</td>
+              <td>$5,240,000</td><td>100.00%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       2. COMMON STOCK CLASSES
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-cs-classes">
+    <div class="sec-hdr" onclick="toggle('sec-cs-classes')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Common Stock Classes
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">3</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Class Name</th>
+              <th>Total Number of Common Stock Class</th>
+              <th>Shares Authorized</th>
+              <th>Shares Issued</th>
+              <th>Fully Diluted Shares</th>
+              <th>Capital Committed</th>
+              <th>Ownership</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Class A</td><td>4,500,000</td><td>6,000,000</td><td>4,500,000</td><td>4,500,000</td><td>$900,000</td><td>36.29%</td></tr>
+            <tr><td>Class B</td><td>1,500,000</td><td>3,000,000</td><td>1,500,000</td><td>1,500,000</td><td>$450,000</td><td>12.10%</td></tr>
+            <tr><td>Class C</td><td>500,000</td><td>1,000,000</td><td>500,000</td><td>500,000</td><td>$150,000</td><td>4.03%</td></tr>
+            <tr class="total-row">
+              <td>Total</td><td>6,500,000</td><td>10,000,000</td><td>6,500,000</td><td>6,500,000</td><td>$1,500,000</td><td>52.42%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       3. PREFERRED STOCK CLASSES
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-ps-classes">
+    <div class="sec-hdr" onclick="toggle('sec-ps-classes')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Preferred Stock Classes
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">3</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Class Name</th>
+              <th>Total Number of Preferred Stock Class</th>
+              <th>Shares Authorized</th>
+              <th>Shares Issued</th>
+              <th>Fully Diluted Shares</th>
+              <th>Capital Committed</th>
+              <th>Ownership</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Series A</td><td>1,500,000</td><td>2,000,000</td><td>1,500,000</td><td>1,500,000</td><td>$1,500,000</td><td>12.10%</td></tr>
+            <tr><td>Series B</td><td>1,000,000</td><td>2,000,000</td><td>1,000,000</td><td>1,000,000</td><td>$1,000,000</td><td>8.06%</td></tr>
+            <tr><td>Series C</td><td>500,000</td><td>1,000,000</td><td>500,000</td><td>500,000</td><td>$500,000</td><td>4.03%</td></tr>
+            <tr class="total-row">
+              <td>Total</td><td>3,000,000</td><td>5,000,000</td><td>3,000,000</td><td>3,000,000</td><td>$3,000,000</td><td>24.19%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       4. OPTION CLASSES
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-opt-classes">
+    <div class="sec-hdr" onclick="toggle('sec-opt-classes')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Option Classes
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">3</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Class Name</th>
+              <th>Total Number of Option Class</th>
+              <th>Shares Authorized</th>
+              <th>Shares Issued</th>
+              <th>Fully Diluted Shares</th>
+              <th>Ownership</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>ISO Pool 2020</td><td>800,000</td><td>1,000,000</td><td>800,000</td><td>950,000</td><td>7.66%</td></tr>
+            <tr><td>NSO Pool 2021</td><td>500,000</td><td>700,000</td><td>500,000</td><td>600,000</td><td>4.84%</td></tr>
+            <tr><td>ISO Pool 2023</td><td>200,000</td><td>300,000</td><td>200,000</td><td>250,000</td><td>2.02%</td></tr>
+            <tr class="total-row">
+              <td>Total</td><td>1,500,000</td><td>2,000,000</td><td>1,500,000</td><td>1,800,000</td><td>14.52%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       5. WARRANT CLASSES
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-wrt-classes">
+    <div class="sec-hdr" onclick="toggle('sec-wrt-classes')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Warrant Classes
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">3</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Class Name</th>
+              <th>Total Number of Warrant Class</th>
+              <th>Shares Authorized</th>
+              <th>Shares Issued</th>
+              <th>Fully Diluted Shares</th>
+              <th>Ownership</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Warrant-2020-A</td><td>150,000</td><td>200,000</td><td>150,000</td><td>200,000</td><td>1.61%</td></tr>
+            <tr><td>Warrant-2021-B</td><td>100,000</td><td>200,000</td><td>100,000</td><td>150,000</td><td>1.21%</td></tr>
+            <tr><td>Warrant-2022-C</td><td>50,000</td><td>100,000</td><td>50,000</td><td>50,000</td><td>0.40%</td></tr>
+            <tr class="total-row">
+              <td>Total</td><td>300,000</td><td>500,000</td><td>300,000</td><td>400,000</td><td>3.22%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       6. CONVERTIBLES (CLASS BREAKDOWN)
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-conv-classes">
+    <div class="sec-hdr" onclick="toggle('sec-conv-classes')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Convertibles
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">3</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Class Name</th>
+              <th>Total Capital Committed</th>
+              <th>Fully Diluted Number of Shares</th>
+              <th>Total Number of Shares Among Classes</th>
+              <th>Total Capital Committed</th>
+              <th>Ownership</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>SAFE-2021</td><td>$300,000</td><td>300,000</td><td>300,000</td><td>$300,000</td><td>2.42%</td></tr>
+            <tr><td>Conv. Note-2022</td><td>$250,000</td><td>250,000</td><td>250,000</td><td>$250,000</td><td>2.02%</td></tr>
+            <tr><td>SAFE-2023</td><td>$190,000</td><td>150,000</td><td>150,000</td><td>$190,000</td><td>1.21%</td></tr>
+            <tr class="total-row">
+              <td>Total</td><td>$740,000</td><td>700,000</td><td>700,000</td><td>$740,000</td><td>5.65%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       7. SHAREHOLDERS
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-sh">
+    <div class="sec-hdr" onclick="toggle('sec-sh')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Shareholders
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">8</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-toolbar">
+        <div class="tbl-toolbar-left">
+          <input class="search-box" type="text" placeholder="Search shareholders…" />
+          <button class="icon-btn" title="Filter">▾ Filter</button>
+        </div>
+        <button class="btn btn-teal btn-sm">+ Create Shareholder</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th><th>Type</th><th>Email</th><th>Secondary Email</th>
+              <th>Phone Number</th><th>Address</th><th>Tax ID</th>
+              <th>Created Date</th><th>Terminated Date</th>
+              <th>Ownership %</th><th>Capital Contribution</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>John Smith</td>
+              <td><span class="badge b-blue">Individual</span></td>
+              <td>john.smith@email.com</td>
+              <td class="null">—</td>
+              <td>+1 415-555-0100</td>
+              <td>123 Main St, San Francisco CA</td>
+              <td>***-**-1234</td>
+              <td>2019-01-15</td>
+              <td class="null">—</td>
+              <td>28.50%</td>
+              <td>$500,000</td>
+              <td class="null">—</td>
+            </tr>
+            <tr>
+              <td>Jane Doe</td>
+              <td><span class="badge b-blue">Individual</span></td>
+              <td>jane.doe@email.com</td>
+              <td class="null">—</td>
+              <td>+1 415-555-0200</td>
+              <td>456 Oak Ave, San Francisco CA</td>
+              <td>***-**-5678</td>
+              <td>2019-01-15</td>
+              <td class="null">—</td>
+              <td>23.90%</td>
+              <td>$400,000</td>
+              <td class="null">—</td>
+            </tr>
+            <tr>
+              <td>Acme Ventures LLC</td>
+              <td><span class="badge b-green">Entity</span></td>
+              <td>invest@acmevc.com</td>
+              <td>legal@acmevc.com</td>
+              <td>+1 650-555-0300</td>
+              <td>789 VC Blvd, Menlo Park CA</td>
+              <td>12-3456789</td>
+              <td>2021-03-10</td>
+              <td class="null">—</td>
+              <td>24.19%</td>
+              <td>$3,000,000</td>
+              <td>Series A &amp; B investor</td>
+            </tr>
+            <tr>
+              <td>Bob Johnson</td>
+              <td><span class="badge b-blue">Individual</span></td>
+              <td>bob.j@email.com</td>
+              <td class="null">—</td>
+              <td>+1 415-555-0400</td>
+              <td>321 Pine St, San Francisco CA</td>
+              <td>***-**-9012</td>
+              <td>2020-06-01</td>
+              <td class="null">—</td>
+              <td>5.00%</td>
+              <td>$100,000</td>
+              <td class="null">—</td>
+            </tr>
+            <tr>
+              <td>Carol White</td>
+              <td><span class="badge b-amber">Advisor</span></td>
+              <td>carol.w@email.com</td>
+              <td class="null">—</td>
+              <td class="null">—</td>
+              <td class="null">—</td>
+              <td class="null">N/A</td>
+              <td>2022-01-01</td>
+              <td class="null">—</td>
+              <td>2.00%</td>
+              <td class="null">—</td>
+              <td>Advisor grant only</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-footer">
+        <span class="tbl-count">1–5 of 8</span>
+        <div class="pagination">
+          <button class="pg-btn">‹</button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       8. COMMON STOCK (DETAIL)
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-cs">
+    <div class="sec-hdr" onclick="toggle('sec-cs')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Common Stock
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">12</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-toolbar">
+        <div class="tbl-toolbar-left">
+          <input class="search-box" type="text" placeholder="Search common stock…" />
+          <button class="icon-btn">▾ Filter</button>
+        </div>
+        <button class="btn btn-teal btn-sm">+ Create Common Stock</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Security Name</th><th>Shareholder Name</th><th>Grant Name</th>
+              <th>Shares/Units Amount</th><th>Outstanding Amount</th>
+              <th>Price Per Share/Unit</th><th>Capital Committed</th>
+              <th>Issued Date</th><th>Vesting Plan Name</th>
+              <th>Shares/Units Vested</th><th>Vesting Start Date</th>
+              <th>Shares/Units Transferred</th><th>Transfer Date</th><th>Transfer To</th>
+              <th>Shares/Units Repurchased</th><th>Repurchase Date</th>
+              <th>Shares/Units Cancelled</th><th>Cancellation Date</th>
+              <th>Source</th><th>Ownership</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Common Stock – Class A</td><td>John Smith</td><td>CS-2019-001</td>
+              <td>3,000,000</td><td>3,000,000</td>
+              <td>$0.10</td><td>$300,000</td>
+              <td>2019-01-15</td><td>4yr / 1yr cliff</td>
+              <td>3,000,000</td><td>2019-01-15</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>Carta Import</td><td>24.19%</td><td class="null">—</td>
+            </tr>
+            <tr>
+              <td>Common Stock – Class A</td><td>Jane Doe</td><td>CS-2019-002</td>
+              <td>2,500,000</td><td>2,500,000</td>
+              <td>$0.10</td><td>$250,000</td>
+              <td>2019-01-15</td><td>4yr / 1yr cliff</td>
+              <td>2,500,000</td><td>2019-01-15</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>Carta Import</td><td>20.16%</td><td class="null">—</td>
+            </tr>
+            <tr>
+              <td>Common Stock – Class B</td><td>Bob Johnson</td><td>CS-2020-003</td>
+              <td>1,000,000</td><td>1,000,000</td>
+              <td>$0.15</td><td>$150,000</td>
+              <td>2020-06-01</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>Manual Entry</td><td>8.06%</td><td class="null">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-footer">
+        <span class="tbl-count">1–3 of 12</span>
+        <div class="pagination">
+          <button class="pg-btn">‹</button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">3</button>
+          <button class="pg-btn">4</button>
+          <button class="pg-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       9. PREFERRED STOCK (DETAIL)
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-ps">
+    <div class="sec-hdr" onclick="toggle('sec-ps')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Preferred Stock
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">6</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-toolbar">
+        <div class="tbl-toolbar-left">
+          <input class="search-box" type="text" placeholder="Search preferred stock…" />
+          <button class="icon-btn">▾ Filter</button>
+        </div>
+        <button class="btn btn-teal btn-sm">+ Create Preferred Stock</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Security Name</th><th>Shareholder Name</th><th>Grant Name</th>
+              <th>Shares/Units Amount</th><th>Outstanding Amount</th>
+              <th>Price Per Share/Unit</th><th>Capital Committed</th>
+              <th>Liquidation Preference</th><th>Issued Date</th>
+              <th>Vesting Plan Name</th><th>Shares/Units Vested</th><th>Vesting Start Date</th>
+              <th>Shares/Units Transferred</th><th>Transfer Date</th><th>Transfer To</th>
+              <th>Shares/Units Repurchased</th><th>Repurchase Date</th>
+              <th>Shares/Units Cancelled</th><th>Cancellation Date</th>
+              <th>Source</th><th>Ownership</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Series A Preferred</td><td>Acme Ventures LLC</td><td>PS-2021-001</td>
+              <td>1,500,000</td><td>1,500,000</td>
+              <td>$1.00</td><td>$1,500,000</td>
+              <td>1× non-participating</td><td>2021-03-10</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>Carta Import</td><td>12.10%</td><td>Series A round</td>
+            </tr>
+            <tr>
+              <td>Series B Preferred</td><td>Acme Ventures LLC</td><td>PS-2022-001</td>
+              <td>1,000,000</td><td>1,000,000</td>
+              <td>$1.00</td><td>$1,000,000</td>
+              <td>1× participating</td><td>2022-06-15</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>Carta Import</td><td>8.06%</td><td>Series B round</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-footer">
+        <span class="tbl-count">1–2 of 6</span>
+        <div class="pagination">
+          <button class="pg-btn">‹</button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">3</button>
+          <button class="pg-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       10. OPTIONS (DETAIL)
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-opt">
+    <div class="sec-hdr" onclick="toggle('sec-opt')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Options
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">15</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-toolbar">
+        <div class="tbl-toolbar-left">
+          <input class="search-box" type="text" placeholder="Search options…" />
+          <button class="icon-btn">▾ Filter</button>
+        </div>
+        <button class="btn btn-teal btn-sm">+ Create Option</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Security Name</th><th>Shareholder Name</th><th>Grant Name</th>
+              <th>Option Type</th><th>Options Amount</th><th>Outstanding Amount</th>
+              <th>Exercise Price</th><th>Issued Date</th>
+              <th>Vesting Plan Name</th><th>Options Vested</th><th>Vesting Start Date</th>
+              <th>Early Exercise</th>
+              <th>Shares/Units Exercised</th><th>Exercise Date</th><th>Exercise To</th>
+              <th>Shares/Units Repurchased</th><th>Repurchase Date</th>
+              <th>Shares/Units Cancelled</th><th>Cancellation Date</th>
+              <th>Ownership</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ISO Pool 2020</td><td>Carol White</td><td>OPT-2022-001</td>
+              <td><span class="badge b-blue">ISO</span></td>
+              <td>250,000</td><td>200,000</td>
+              <td>$0.42</td><td>2022-01-01</td>
+              <td>4yr / 1yr cliff</td><td>125,000</td><td>2022-01-01</td>
+              <td>No</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>50,000</td><td>2023-12-01</td>
+              <td>2.02%</td><td>Advisor grant</td>
+            </tr>
+            <tr>
+              <td>NSO Pool 2021</td><td>Dave Brown</td><td>OPT-2021-005</td>
+              <td><span class="badge b-amber">NSO</span></td>
+              <td>100,000</td><td>100,000</td>
+              <td>$0.30</td><td>2021-07-01</td>
+              <td>4yr monthly</td><td>50,000</td><td>2021-07-01</td>
+              <td>No</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>0.81%</td><td class="null">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-footer">
+        <span class="tbl-count">1–2 of 15</span>
+        <div class="pagination">
+          <button class="pg-btn">‹</button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       11. WARRANTS (DETAIL)
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-wrt">
+    <div class="sec-hdr" onclick="toggle('sec-wrt')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Warrants
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">4</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-toolbar">
+        <div class="tbl-toolbar-left">
+          <input class="search-box" type="text" placeholder="Search warrants…" />
+          <button class="icon-btn">▾ Filter</button>
+        </div>
+        <button class="btn btn-teal btn-sm">+ Create Warrant</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Security Name</th><th>Shareholder Name</th><th>Grant Name</th>
+              <th>Warrant Amount</th><th>Outstanding Amount</th>
+              <th>Exercise Price</th><th>Issue Date</th>
+              <th>Vesting Plan Name</th><th>Warrants Vested</th><th>Vesting Start Date</th>
+              <th>Shares/Units Exercised</th><th>Exercise Date</th><th>Exercise To</th>
+              <th>Shares/Units Repurchased</th><th>Repurchase Date</th>
+              <th>Shares/Units Cancelled</th><th>Cancellation Date</th>
+              <th>Ownership</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Warrant-2020-A</td><td>First Bank LLC</td><td>WRT-2020-001</td>
+              <td>150,000</td><td>150,000</td>
+              <td>$0.50</td><td>2020-09-01</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>1.21%</td><td>Bank loan warrant</td>
+            </tr>
+            <tr>
+              <td>Warrant-2021-B</td><td>Tech Angels Group</td><td>WRT-2021-001</td>
+              <td>100,000</td><td>100,000</td>
+              <td>$0.75</td><td>2021-05-15</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>0.81%</td><td>Angel round warrant</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-footer">
+        <span class="tbl-count">1–2 of 4</span>
+        <div class="pagination">
+          <button class="pg-btn">‹</button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       12. SAFE & CONVERTIBLE NOTES (DETAIL)
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-safe">
+    <div class="sec-hdr" onclick="toggle('sec-safe')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        SAFE &amp; Convertible Notes
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">5</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-toolbar">
+        <div class="tbl-toolbar-left">
+          <input class="search-box" type="text" placeholder="Search convertibles…" />
+          <button class="icon-btn">▾ Filter</button>
+        </div>
+        <button class="btn btn-teal btn-sm">+ Create SAFE / Note</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Shareholder Name</th><th>Type</th><th>Note Name</th>
+              <th>Principal Amount</th><th>Interest Rate</th><th>Interest</th>
+              <th>Accrual Frequency</th><th>Conversion Discount</th>
+              <th>Valuation Cap</th><th>Conversion Trigger Amount</th>
+              <th>Early Exit Multiple</th><th>Issue Date</th><th>Maturity Date</th>
+              <th>Conversion Date</th><th>Convert To</th><th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Seed Capital Fund</td>
+              <td><span class="badge b-teal">SAFE</span></td>
+              <td>SAFE-2021-001</td>
+              <td>$150,000</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td>20%</td><td>$5,000,000</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>2021-08-01</td><td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td>Post-money SAFE</td>
+            </tr>
+            <tr>
+              <td>Angel Investor A</td>
+              <td><span class="badge b-teal">SAFE</span></td>
+              <td>SAFE-2021-002</td>
+              <td>$150,000</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td>20%</td><td>$5,000,000</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>2021-09-15</td><td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td>
+            </tr>
+            <tr>
+              <td>Bridge Lender LLC</td>
+              <td><span class="badge b-amber">Conv. Note</span></td>
+              <td>CN-2022-001</td>
+              <td>$250,000</td>
+              <td>6.00%</td><td>$15,000</td><td>Annual</td>
+              <td>15%</td><td>$8,000,000</td>
+              <td>$1,000,000</td><td>1.5×</td>
+              <td>2022-01-15</td>
+              <td style="color:var(--orange-text); font-weight:600;">2024-01-15</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>Bridge round</td>
+            </tr>
+            <tr>
+              <td>Future Capital</td>
+              <td><span class="badge b-teal">SAFE</span></td>
+              <td>SAFE-2023-001</td>
+              <td>$190,000</td>
+              <td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td>10%</td><td>$10,000,000</td>
+              <td class="null">—</td><td class="null">—</td>
+              <td>2023-03-01</td><td class="null">—</td><td class="null">—</td><td class="null">—</td>
+              <td class="null">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tbl-footer">
+        <span class="tbl-count">1–4 of 5</span>
+        <div class="pagination">
+          <button class="pg-btn">‹</button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       13. QUESTIONS TO CLIENT
+  ══════════════════════════════════════════════════════ -->
+  <div class="section" id="sec-q">
+    <div class="sec-hdr" onclick="toggle('sec-q')">
+      <div class="sec-title">
+        <span class="chevron up">›</span>
+        Questions to Client
+        <span class="q-open-tag">7 Open</span>
+      </div>
+      <div class="sec-right">
+        <span class="count-badge">8</span>
+        <span class="sec-icon">⚙</span>
+        <span class="sec-icon">👁</span>
+      </div>
+    </div>
+    <div class="sec-body">
+      <div class="tbl-toolbar">
+        <div class="tbl-toolbar-left">
+          <input class="search-box" type="text" placeholder="Search questions…" />
+        </div>
+        <button class="btn btn-teal btn-sm">+ Add Question</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:36px;">#</th>
+              <th>Question</th>
+              <th>Status</th>
+              <th>Related Section</th>
+              <th>Priority</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td style="white-space:normal; max-width:480px;">
+                Please confirm total authorized shares for Class A Common Stock — source shows 6,000,000 but company docs indicate 7,500,000.
+              </td>
+              <td><span class="badge b-red">Open</span></td>
+              <td>Common Stock Classes</td>
+              <td><span class="badge b-red">High</span></td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td style="white-space:normal; max-width:480px;">
+                Series C Preferred Stock conversion ratio is missing. Please supply the certificate of incorporation or term sheet.
+              </td>
+              <td><span class="badge b-red">Open</span></td>
+              <td>Preferred Stock Classes</td>
+              <td><span class="badge b-red">High</span></td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td style="white-space:normal; max-width:480px;">
+                Option grant OPT-2021-005 (Dave Brown) is missing exercise price documentation. Can you provide the board approval memo?
+              </td>
+              <td><span class="badge b-red">Open</span></td>
+              <td>Options</td>
+              <td><span class="badge b-blue">Medium</span></td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td style="white-space:normal; max-width:480px;">
+                SAFE-2021-002 (Angel Investor A) — valuation cap of $5M appears inconsistent with SAFE-2021-001. Please confirm both are identical.
+              </td>
+              <td><span class="badge b-green">Resolved</span></td>
+              <td>SAFE &amp; Convertibles</td>
+              <td><span class="badge b-blue">Medium</span></td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td style="white-space:normal; max-width:480px;">
+                Is there a board-approved option pool increase after the Series B round? The cap table mentions a pool refresh but no documentation was provided.
+              </td>
+              <td><span class="badge b-red">Open</span></td>
+              <td>Option Classes</td>
+              <td><span class="badge b-red">High</span></td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td style="white-space:normal; max-width:480px;">
+                Tax IDs are missing for 3 shareholders (Carol White, Dave Brown, Angel Investor A). Please provide SSN or EIN for each.
+              </td>
+              <td><span class="badge b-red">Open</span></td>
+              <td>Shareholders</td>
+              <td><span class="badge b-blue">Medium</span></td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td style="white-space:normal; max-width:480px;">
+                Convertible note CN-2022-001 maturity date was 2024-01-15. Has this matured? If so, was it converted, repaid, or extended?
+              </td>
+              <td><span class="badge b-red">Open</span></td>
+              <td>SAFE &amp; Convertibles</td>
+              <td><span class="badge b-red">High</span></td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td style="white-space:normal; max-width:480px;">
+                Please confirm whether Warrant-2022-C has been exercised or is still outstanding — no exercise record was found in the data room.
+              </td>
+              <td><span class="badge b-red">Open</span></td>
+              <td>Warrants</td>
+              <td><span class="badge b-gray">Low</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page-body -->
+
+<script>
+  function toggle(id) {
+    const sec  = document.getElementById(id);
+    const body = sec.querySelector('.sec-body');
+    const chev = sec.querySelector('.chevron');
+    const isOpen = !body.classList.contains('hidden');
+    body.classList.toggle('hidden', isOpen);
+    chev.classList.toggle('up', !isOpen);
+  }
+</script>
+</body>
+</html>
